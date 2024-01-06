@@ -1,15 +1,13 @@
-// const player1 = document.getElementById("player1");
-const button1 = document.getElementById("button1");
+const pausePlay = document.getElementById("pause-play");
+
 const gameWindow = document.getElementById("game-window");
-
 const gameWindowRect = gameWindow.getBoundingClientRect();
-// let player1Y = player1.getBoundingClientRect().top;
-// let player1X = player1.getBoundingClientRect().left;
-
 
 class Player {
-  constructor(){
-    this.div = document.getElementById("player1");
+  constructor(_playerId){
+    this.playerId = _playerId;
+    this.div = document.getElementById(_playerId);
+    this.speed = 4;
     this.boundries = {
       top: false,
       bottom: false,
@@ -34,110 +32,153 @@ class Player {
   }
 
   checkBoundries(){
+    let playerRect = this.div.getBoundingClientRect();
+      if(playerRect.right >= gameWindowRect.right){
+        this.boundries.right = true;
+      } else {
+        this.boundries.right = false;
+      }
+      if(playerRect.left <= gameWindowRect.left){
+        this.boundries.left = true;
+      } else {
+        this.boundries.left = false;
+      }
+      if(playerRect.top <= gameWindowRect.top){
+        this.boundries.top = true;
+      } else {
+        this.boundries.top = false;
+      }
+      if(playerRect.bottom >= gameWindowRect.bottom){
+        this.boundries.bottom = true;
+      } else {
+        this.boundries.bottom = false;
+      }
+  }
 
+  movePlayer(_keysPressed){
+    if(pausePlay.textContent === "resume") {
+      return;
+    }
+  
+    this.checkBoundries();
+    
+    if (_keysPressed.up && !this.boundries.top) {
+      this.incrementPos(0,-this.speed);
+    }
+    if (_keysPressed.down && !this.boundries.bottom) {
+      this.incrementPos(0,this.speed);
+    }
+    if (_keysPressed.left && !this.boundries.left) {
+      this.incrementPos(-this.speed,0);
+    }
+    if (_keysPressed.right && !this.boundries.right) {
+      this.incrementPos(this.speed,0);
+    }
+
+    this.gravityFall();
+    
+    // arrow function creating closure for arrows pressed.
+    requestAnimationFrame(() => {
+      this.movePlayer(_keysPressed)
+    });
+    
+  }
+
+  gravityFall(){
+    this.checkBoundries();
+    if(this.boundries.bottom){
+      return;
+    }
+    this.incrementPos(0,0.4);
   }
 }
 
-var player1 = new Player();
-
-// console.log(player1.div);
-
-
-
-
 const keysPressed = {
-  ArrowUp: false,
-  ArrowDown: false,
-  ArrowRight: false,
-  ArrowLeft: false
-}
-const playerBoundries = {
-  top: false,
-  bottom: false,
-  left: false,
-  right: false
-}
+  player1 : { up : false, down : false, left : false, right : false }, 
+  player2 : { up : false, down : false, left : false, right : false }
+};
 
 // listen for keys state.
 document.addEventListener("keydown", handleKeyDown);
 document.addEventListener("keyup", handleKeyUp);
-// button1.addEventListener("click", ()=>{
-//   if(button1.textContent === "pause"){
-//     button1.textContent = "resume"; // not playing
-//   } else {
-//     button1.textContent = "pause"; // playing
-//     movePlayer();
-//   }
-// })
+pausePlay.addEventListener("click", ()=>{
+  if(pausePlay.textContent === "pause"){
+    pausePlay.textContent = "resume"; // not playing
+  } else {
+    pausePlay.textContent = "pause"; // playing
+    player1.movePlayer(keysPressed.player1);
+    player2.movePlayer(keysPressed.player2);
+  }
+})
+
 
 function handleKeyDown(event){
-  keysPressed[event.key] = true;
-  // movePlayer();
+  let foo = true;
+  switch (event.key){
+    case 'ArrowUp':
+      keysPressed.player1.up = foo;
+      break;
+    case 'ArrowDown':
+      keysPressed.player1.down = foo;
+      break;
+    case 'ArrowLeft':
+      keysPressed.player1.left = foo;
+      break;
+    case 'ArrowRight':
+      keysPressed.player1.right = foo;
+      break;
+    case 'w':
+      keysPressed.player2.up = foo;
+      break;
+    case 's':
+      keysPressed.player2.down = foo;
+      break;
+    case 'a':
+      keysPressed.player2.left = foo;
+      break;
+    case 'd':
+      keysPressed.player2.right = foo;
+      break;
+  }
+  // keysPressed.player1[event.key] = true;
 }
 function handleKeyUp(event){
-  keysPressed[event.key] = false;
-  // movePlayer();
-}
-
-// function checkBoundries(){
-//   let player1Rect = player1.getBoundingClientRect();
-//   if(player1Rect.right >= gameWindowRect.right){
-//     playerBoundries.right = true;
-//   } else {
-//     playerBoundries.right = false;
-//   }
-//   if(player1Rect.left <= gameWindowRect.left){
-//     playerBoundries.left = true;
-//   } else {
-//     playerBoundries.left = false;
-//   }
-//   if(player1Rect.top <= gameWindowRect.top){
-//     playerBoundries.top = true;
-//   } else {
-//     playerBoundries.top = false;
-//   }
-//   if(player1Rect.bottom >= gameWindowRect.bottom){
-//     playerBoundries.bottom = true;
-//   } else {
-//     playerBoundries.bottom = false;
-//   }
-// }
-
-movePlayer(player1);
-function movePlayer(_player){
-  // if(button1.textContent === "resume") {
-  //   return;
-  // }
-
-  const speed = 4;
-
-  // checkBoundries();
-  
-  if (keysPressed.ArrowUp && !playerBoundries.top) {
-    _player.incrementPos(0,-speed);
+  let foo = false;
+  switch (event.key){
+    case 'ArrowUp':
+      keysPressed.player1.up = foo;
+      break;
+    case 'ArrowDown':
+      keysPressed.player1.down = foo;
+      break;
+    case 'ArrowLeft':
+      keysPressed.player1.left = foo;
+      break;
+    case 'ArrowRight':
+      keysPressed.player1.right = foo;
+      break;
+    case 'w':
+      keysPressed.player2.up = foo;
+      break;
+    case 's':
+      keysPressed.player2.down = foo;
+      break;
+    case 'a':
+      keysPressed.player2.left = foo;
+      break;
+    case 'd':
+      keysPressed.player2.right = foo;
+      break;
   }
-  if (keysPressed.ArrowDown && !playerBoundries.bottom) {
-    _player.incrementPos(0,speed);
-  }
-  if (keysPressed.ArrowLeft && !playerBoundries.left) {
-    _player.incrementPos(-speed,0);
-  }
-  if (keysPressed.ArrowRight && !playerBoundries.right) {
-    _player.incrementPos(speed,0);
-  }
-
-  requestAnimationFrame(() => {
-    movePlayer(_player);
-  });
-  
 }
 
 
-// // gravity.
-// function gravityFall(){
-//   if(playerBoundries.bottom){
-//     return;
-//   }
-//   player1Y += 0.4;
-//   player1.style.top = `${player1Y}px`;
-// }
+const player1 = new Player("player1");
+const player2 = new Player("player2");
+
+player1.movePlayer(keysPressed.player1);
+player2.movePlayer(keysPressed.player2);
+
+
+
+
